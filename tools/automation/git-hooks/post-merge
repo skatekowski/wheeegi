@@ -1,0 +1,13 @@
+#!/bin/bash
+# Post-merge hook: Document merges and updates
+# Install: cp tools/automation/git-hooks/post-merge .git/hooks/post-merge
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+MERGE_MSG=$(git log -1 --pretty=format:"%s")
+
+node tools/automation/doc-process.js \
+  --type milestone \
+  --title "Merge: $BRANCH" \
+  --content "Merged branch: $BRANCH\n\n$MERGE_MSG" > /dev/null 2>&1
+
+echo "✅ Auto-documented merge in process journal"

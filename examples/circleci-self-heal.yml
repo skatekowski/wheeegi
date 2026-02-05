@@ -1,0 +1,62 @@
+# CircleCI configuration with Self-Healing Build
+# Place this in .circleci/config.yml
+
+version: 2.1
+
+jobs:
+  self-heal:
+    docker:
+      - image: cimg/node:18.0
+    steps:
+      - checkout
+      - run:
+          name: Self-Heal Build Issues
+          command: |
+            echo "🔧 Running self-healing build system..."
+            node tools/automation/self-heal-build.js --fix-all || true
+            echo "✅ Self-healing complete"
+      - run:
+          name: Install dependencies
+          command: npm ci
+      - run:
+          name: Run linting
+          command: npm run lint || true
+      - run:
+          name: Run tests
+          command: npm test
+      - run:
+          name: Build project
+          command: npm run build
+      - store_artifacts:
+          path: dist/
+          destination: build-artifacts
+
+  health-check:
+    docker:
+      - image: cimg/node:18.0
+    steps:
+      - checkout
+      - run:
+          name: Health Check
+          command: |
+            echo "🏥 Running health checks..."
+            node tools/automation/health-check.js --all || true
+
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - self-heal:
+          filters:
+            branches:
+              only:
+                - main
+                - develop
+                - /^feature\/.*/
+      - health-check:
+          requires:
+            - self-heal
+          filters:
+            branches:
+              only:
+                - main

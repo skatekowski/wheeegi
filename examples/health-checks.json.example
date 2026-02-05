@@ -1,0 +1,49 @@
+{
+  "checks": [
+    {
+      "name": "API Health Endpoint",
+      "type": "http",
+      "url": "https://api.example.com/health",
+      "expectedStatus": 200,
+      "timeout": 10000,
+      "retries": 3
+    },
+    {
+      "name": "Database Connection",
+      "type": "database",
+      "provider": "postgres",
+      "connectionString": "${DATABASE_URL}",
+      "query": "SELECT 1"
+    },
+    {
+      "name": "Redis Cache",
+      "type": "redis",
+      "host": "localhost",
+      "port": 6379,
+      "password": "${REDIS_PASSWORD}"
+    },
+    {
+      "name": "External API",
+      "type": "http",
+      "url": "https://external-api.example.com/status",
+      "expectedStatus": 200,
+      "headers": {
+        "Authorization": "Bearer ${API_TOKEN}"
+      }
+    }
+  ],
+  "autoRestart": {
+    "enabled": false,
+    "command": "npm start",
+    "maxRestarts": 3,
+    "restartDelay": 5000
+  },
+  "alerting": {
+    "enabled": true,
+    "channels": ["slack", "email"],
+    "threshold": {
+      "failures": 3,
+      "duration": 300000
+    }
+  }
+}

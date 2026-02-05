@@ -1,0 +1,18 @@
+{
+  "description": "Index of canonical project memory and source-of-truth files (B.L.A.S.T.)",
+  "version": "1.0.0",
+  "sources": {
+    "task_plan": "project/task_plan.md",
+    "findings": "project/findings.md",
+    "progress": "project/progress.md",
+    "process_journal": "project/process-journal.md",
+    "gemini": "project/gemini.md",
+    "architecture": "project/architecture.md",
+    "changelog": "project/changelog.md",
+    "errors": "project/errors.md",
+    "gsd_planning": ".planning/PROJECT.md",
+    "gsd_requirements": ".planning/REQUIREMENTS.md",
+    "gsd_roadmap": ".planning/ROADMAP.md",
+    "gsd_state": ".planning/STATE.md"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "sessions": [
+    {
+      "timestamp": "2026-02-05T19:29:59.587Z",
+      "signals": [
+        {
+          "type": "failure",
+          "name": "Source of Truth Index",
+          "message": "Missing index."
+        }
+      ]
+    }
+  ]
+}

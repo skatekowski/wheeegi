@@ -1,0 +1,9 @@
+{
+  "version": "1.3.0",
+  "modules": {
+    "agent-turbo": false,
+    "multi-agent": true,
+    "multi-agent/orchestrator": true,
+    "design-mode": false
+  }
+}

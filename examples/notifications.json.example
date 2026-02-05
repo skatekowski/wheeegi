@@ -1,0 +1,34 @@
+{
+  "enabled": true,
+  "channels": {
+    "slack": {
+      "enabled": false,
+      "webhook": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+    },
+    "discord": {
+      "enabled": false,
+      "webhook": "https://discord.com/api/webhooks/YOUR/WEBHOOK/URL"
+    },
+    "email": {
+      "enabled": false,
+      "recipients": [
+        "team@example.com"
+      ],
+      "smtp": {
+        "host": "smtp.example.com",
+        "port": 587,
+        "secure": false,
+        "auth": {
+          "user": "your-email@example.com",
+          "pass": "your-password"
+        }
+      }
+    },
+    "github": {
+      "enabled": false,
+      "repo": "owner/repo",
+      "createIssue": false,
+      "token": "GITHUB_TOKEN"
+    }
+  }
+}

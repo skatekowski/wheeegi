@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+:root {
+  --surface-0: #0a0a0a;
+  --surface-1: #111111;
+  --surface-2: #1a1a1a;
+  --surface-3: #222222;
+  --border: #2a2a2a;
+  --text-primary: #ffffff;
+  --text-secondary: #888888;
+  --text-muted: #555555;
+  --accent: #ffffff;
+}
+
+body {
+  @apply text-gray-100 font-sans antialiased;
+  background: var(--surface-0);
+  min-height: 100vh;
+}
+
+/* Minimal card */
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+}
+
+.card:hover {
+  border-color: #333;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+::selection {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Status colors - subtle */
+.status-green { color: #22c55e; }
+.status-yellow { color: #eab308; }
+.status-red { color: #ef4444; }
+.bg-status-green { background: rgba(34, 197, 94, 0.1); }
+.bg-status-yellow { background: rgba(234, 179, 8, 0.1); }
+.bg-status-red { background: rgba(239, 68, 68, 0.1); }

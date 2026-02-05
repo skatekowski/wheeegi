@@ -1,0 +1,37 @@
+#!/bin/bash
+# Post-commit hook: Auto-document commits in process journal
+# Install: cp tools/automation/git-hooks/post-commit .git/hooks/post-commit
+
+COMMIT_MSG=$(git log -1 --pretty=format:"%s")
+AUTHOR=$(git log -1 --pretty=format:"%an")
+FILES_CHANGED=$(git diff-tree --no-commit-id --name-only -r HEAD | head -5 | tr '\n' ',' | sed 's/,$//')
+
+# Auto-detect commit type and document accordingly
+if echo "$COMMIT_MSG" | grep -qiE "(feat|implement|add|create)"; then
+    TYPE="milestone"
+    TITLE="Code Implementation: $(echo "$COMMIT_MSG" | cut -d: -f2 | cut -d' ' -f1-3)"
+    CONTENT="Implemented: $COMMIT_MSG\n\nFiles changed: $FILES_CHANGED"
+elif echo "$COMMIT_MSG" | grep -qiE "(fix|bug|error)"; then
+    TYPE="challenge"
+    TITLE="Bug Fix: $(echo "$COMMIT_MSG" | cut -d: -f2 | cut -d' ' -f1-3)"
+    CONTENT="Fixed: $COMMIT_MSG"
+elif echo "$COMMIT_MSG" | grep -qiE "(docs|documentation)"; then
+    TYPE="learning"
+    TITLE="Documentation Update"
+    CONTENT="Updated documentation: $COMMIT_MSG"
+else
+    TYPE="milestone"
+    TITLE="Commit: $(echo "$COMMIT_MSG" | cut -d' ' -f1-5)"
+    CONTENT="$COMMIT_MSG"
+fi
+
+# Document in process journal
+node tools/automation/doc-process.js \
+  --type "$TYPE" \
+  --title "$TITLE" \
+  --content "$CONTENT" > /dev/null 2>&1
+
+# Auto-update progress.md
+node tools/automation/update-progress.js --commit-msg "$COMMIT_MSG" > /dev/null 2>&1
+
+echo "✅ Auto-documented commit in process journal"

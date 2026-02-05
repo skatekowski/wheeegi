@@ -1,0 +1,78 @@
+# GitLab CI/CD with Self-Healing Build
+# Place this in .gitlab-ci.yml
+
+stages:
+  - self-heal
+  - test
+  - build
+  - deploy
+
+variables:
+  NODE_VERSION: "18"
+
+self-heal:
+  stage: self-heal
+  image: node:${NODE_VERSION}
+  script:
+    - echo "🔧 Running self-healing build system..."
+    - node tools/automation/self-heal-build.js --fix-all || true
+    - echo "✅ Self-healing complete"
+  artifacts:
+    paths:
+      - project/errors.md
+    expire_in: 1 week
+  only:
+    - merge_requests
+    - main
+    - develop
+
+test:
+  stage: test
+  image: node:${NODE_VERSION}
+  dependencies:
+    - self-heal
+  script:
+    - npm ci
+    - npm run lint
+    - npm test
+  coverage: '/Lines\s*:\s*(\d+\.\d+)%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+  only:
+    - merge_requests
+    - main
+    - develop
+
+build:
+  stage: build
+  image: node:${NODE_VERSION}
+  dependencies:
+    - test
+  script:
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
+  only:
+    - main
+    - tags
+
+deploy:
+  stage: deploy
+  image: node:${NODE_VERSION}
+  dependencies:
+    - build
+  script:
+    - echo "Deploying to production..."
+    # Add your deployment commands here
+  environment:
+    name: production
+  only:
+    - main
+    - tags
+  when: manual

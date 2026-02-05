@@ -1,0 +1,3 @@
+# AGI core — no demo deps; add LLM/vector backends as needed
+# python >= 3.9
+pytest>=7.0
