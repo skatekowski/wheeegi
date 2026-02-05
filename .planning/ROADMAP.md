@@ -27,3 +27,8 @@
 - [x] Reflection: reflect(state) → semantic facts after successful tool use; optional reflect_fn in Agent
 - [x] tests/test_reflect.py (4 tests); 26 tests total
 - [x] pyproject.toml: agi-core package, console_script agi; pip install -e . then agi --help
+
+## Phase 5: Experiments (03-experiments)
+- [x] Reasoner: "what do you remember?" → respond with recalled summary; chaining (last_observation → read first file); thought; recalled semantic in beliefs
+- [x] Core: store thought in working memory; up to 2 acts per tick (autonomous chaining list_dir → read first file)
+- [x] wheee orchestrate 03-experiments

@@ -14,6 +14,12 @@ One loop: **perceive → recall → reason → plan → act → store**. No demo
 
 Memory can be persisted to JSON (`--memory PATH`); working memory is session-only.
 
+### Experiments (Phase 03)
+
+- **Autonomous chaining**: One tick can run up to 2 acts. After `list_dir` with entries, the reasoner may suggest `read_file` on the first file-like entry so “list directory src” can end with the content of the first file in `src`.
+- **“What do you remember?”**: Inputs like “what do you remember?”, “summarize”, “recall”, “memory” get a response built from recalled semantic facts and episodic events.
+- **Thought**: The reasoner returns a short “thought” (e.g. “User requested list_dir; I will run it.”); the core stores it in working memory as `last_thought`. Use `--show-thought` to print it to stderr.
+
 ## Requirements
 
 - Python ≥ 3.9
@@ -35,6 +41,8 @@ agi "Hello"
 agi "list directory ."
 agi "read file requirements.txt"
 agi --memory .agi-memory.json "list directory ."
+agi --show-thought "list directory ."
+agi --memory .agi-memory.json "what do you remember?"
 echo -e "list dir .\nread file README.md" | agi --loop
 
 # Without install (from repo)

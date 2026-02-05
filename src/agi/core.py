@@ -76,40 +76,62 @@ class Agent:
         # Reason
         reason_out = self.reason_fn(state)
         state["beliefs"] = reason_out.get("beliefs", {})
+        # Store internal thought in working memory (experiment: interpretability)
+        thought = reason_out.get("thought", "")
+        if thought and hasattr(self.store, "set_working"):
+            self.store.set_working("last_thought", thought)
         # Plan
         tools_list = self.registry.list_tools()
         state["plan"] = self.plan_fn(state["goal"], reason_out, tools_list)
         next_step = state["plan"].get("next_step") or {"action": "respond", "args": {"text": perceived.normalized or "OK."}}
-        # Act
-        action_name = next_step.get("action", "respond")
-        action_args = next_step.get("args", {})
-        observation = execute_tool(self.registry, action_name, action_args)
-        state["observation"] = observation
-        # Store
-        self.store.store_episodic([
-            {"event": "tick", "context": {"input_preview": perceived.normalized[:100], "action": action_name, "success": observation.get("success")}}
-        ])
-        if hasattr(self.store, "push_turn"):
-            self.store.push_turn({"input": state["input"], "action": action_name, "observation": observation})
-        # Reflect: optional semantic facts from observation (e.g. "user requested list and got N entries")
-        state["action"] = action_name
-        entries = self.reflect_fn(state)
-        if entries:
-            self.store.store_semantic(entries)
-        # Halt if response or successful tool result (read_file/list_dir)
+        # Act (up to 2 acts per tick: optional chain list_dir -> read first file)
+        max_acts = 2
         response_text = None
         halt = False
-        if observation.get("success") and isinstance(observation.get("payload"), dict):
-            payload = observation["payload"]
-            if payload.get("type") == "response":
-                response_text = payload.get("text", "")
+        observation = None
+        for _ in range(max_acts):
+            action_name = next_step.get("action", "respond")
+            action_args = next_step.get("args", {})
+            observation = execute_tool(self.registry, action_name, action_args)
+            state["observation"] = observation
+            # Store
+            self.store.store_episodic([
+                {"event": "tick", "context": {"input_preview": state["input"].get("normalized", "")[:100], "action": action_name, "success": observation.get("success")}}
+            ])
+            if hasattr(self.store, "push_turn"):
+                self.store.push_turn({"input": state["input"], "action": action_name, "observation": observation})
+            state["action"] = action_name
+            entries = self.reflect_fn(state)
+            if entries:
+                self.store.store_semantic(entries)
+            # Halt if response or content (read_file result)
+            if observation.get("success") and isinstance(observation.get("payload"), dict):
+                payload = observation["payload"]
+                if payload.get("type") == "response":
+                    response_text = payload.get("text", "")
+                    halt = True
+                    break
+                elif "content" in payload:
+                    response_text = payload.get("content", "")
+                    halt = True
+                    break
+                elif "entries" in payload:
+                    # Don't halt yet: try chaining (list_dir -> read first file)
+                    response_text = "\n".join(payload.get("entries", [])) or "(empty)"
+            # Chaining: if we have last_observation (e.g. list_dir), reason again and maybe do second act
+            state["last_observation"] = observation
+            state["input"] = {"raw": "(continue)", "normalized": "continue with previous result", "source": "env"}
+            reason_out = self.reason_fn(state)
+            state["beliefs"] = reason_out.get("beliefs", {})
+            if reason_out.get("thought") and hasattr(self.store, "set_working"):
+                self.store.set_working("last_thought", reason_out.get("thought", ""))
+            state["plan"] = self.plan_fn(state["goal"], reason_out, tools_list)
+            next_step = state["plan"].get("next_step") or {"action": "respond", "args": {"text": response_text or str(observation)}}
+            if next_step.get("action") == "respond":
+                response_text = next_step.get("args", {}).get("text", response_text or "")
                 halt = True
-            elif "content" in payload:
-                response_text = payload.get("content", "")
-                halt = True
-            elif "entries" in payload:
-                response_text = "\n".join(payload.get("entries", [])) or "(empty)"
-                halt = True
+                break
+        observation = observation or {}
         return TickOutput(observation=observation, response=response_text, halt=halt)
 
 

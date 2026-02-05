@@ -68,3 +68,6 @@ main.py           # Entry (CLI / server later)
 
 ## Phase: 02-extensions
 - Layer 1: Technical SOP defined.
+
+## Phase: 03-experiments
+- Layer 1: Technical SOP defined.

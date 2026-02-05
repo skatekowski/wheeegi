@@ -8,3 +8,6 @@
 
 ## Phase: 02-extensions
 - Link: API/credentials verified (or documented as N/A).
+
+## Phase: 03-experiments
+- Link: API/credentials verified (or documented as N/A).

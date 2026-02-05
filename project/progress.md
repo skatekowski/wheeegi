@@ -71,3 +71,27 @@
 
 ## Phase: 02-extensions
 - Docs Agent: Documentation updated.
+
+## Phase: 03-experiments
+- Navigator: Decision tree updated for phase.
+
+## Phase: 03-experiments
+- Tools (Coder): Layer-3 scripts/tools updated.
+
+## Phase: 03-experiments
+- Tester: Validation run (unit/integration).
+
+## Phase: 03-experiments
+- Stylize (Designer): Payloads/UI refined.
+
+## Phase: 03-experiments
+- Frontend Agent: UI/components updated.
+
+## Phase: 03-experiments
+- Backend Agent: APIs/services updated.
+
+## Phase: 03-experiments
+- Test Agent: Integration/E2E tests updated.
+
+## Phase: 03-experiments
+- Docs Agent: Documentation updated.

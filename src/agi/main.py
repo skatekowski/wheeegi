@@ -32,6 +32,7 @@ def main() -> None:
     parser.add_argument("--max-ticks", type=int, default=10, help="Max ticks before stopping (default 10)")
     parser.add_argument("--loop", action="store_true", help="Multi-turn REPL: read line, tick, print; exit on empty line")
     parser.add_argument("--memory", metavar="PATH", default=None, help="Load/save semantic+episodic memory to JSON file")
+    parser.add_argument("--show-thought", action="store_true", help="Print agent's last thought (working memory) to stderr")
     args = parser.parse_args()
 
     store = load_store(args.memory) if args.memory else None
@@ -48,6 +49,10 @@ def main() -> None:
                     break
                 inp = TickInput(raw=raw, source="user")
                 out = tick(agent, inp)
+                if args.show_thought and hasattr(agent.store, "get_working"):
+                    thought = agent.store.get_working("last_thought")
+                    if thought:
+                        print("[thought] %s" % thought, file=sys.stderr)
                 _print_output(out)
                 if args.memory:
                     save_store(agent.store, args.memory)
@@ -66,6 +71,10 @@ def main() -> None:
 
     inp = TickInput(raw=raw, source="user")
     out = tick(agent, inp)
+    if args.show_thought and hasattr(agent.store, "get_working"):
+        thought = agent.store.get_working("last_thought")
+        if thought:
+            print("[thought] %s" % thought, file=sys.stderr)
     _print_output(out)
     if args.memory:
         save_store(agent.store, args.memory)
